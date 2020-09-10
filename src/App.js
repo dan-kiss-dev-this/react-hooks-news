@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -7,6 +6,7 @@ function App() {
   const [results, setResults] = useState([])
   const [query, setQuery] = useState('react hooks');
   console.log(9, results, query)
+  const searchInputRef = useRef() //returns a ref object
 
   useEffect(() => {
     getResults()
@@ -15,7 +15,7 @@ function App() {
     //   setResults(response.data.hits)
     //   console.log(13, results)
     // })
-  },[]);
+  }, []);
 
   const getResults = async () => {
     const response = await axios.get(
@@ -29,12 +29,22 @@ function App() {
     getResults()
   }
 
+  const handleClearSearch = () => {
+    setQuery('')
+    searchInputRef.current.focus();
+  }
+
   console.log(17, results)
   return (
     <div>
       <form onSubmit={handleSearch}>
-        <input type="text" onChange={event => setQuery(event.target.value)} value={query} />
+        <input
+          type="text"
+          onChange={event => setQuery(event.target.value)} value={query}
+          ref={searchInputRef}
+        />
         <button type="submit">Submit</button>
+        <button type="button" onClick={handleClearSearch}>Clear</button>
         <ul>
           {results.map((result, index) => (
             <li key={result.ObjectId}>
