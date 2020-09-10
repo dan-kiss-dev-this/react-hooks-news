@@ -5,23 +5,29 @@ import './App.css';
 function App() {
   const [results, setResults] = useState([])
   const [query, setQuery] = useState('react hooks');
-  console.log(9, results, query)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const searchInputRef = useRef() //returns a ref object
 
   useEffect(() => {
     getResults()
     // .then(response => {
-    //   console.log(10, response.data)
     //   setResults(response.data.hits)
-    //   console.log(13, results)
     // })
   }, []);
 
   const getResults = async () => {
-    const response = await axios.get(
-      `http://hn.algolia.com/api/v1/search?query=${query}`
-    );
-    setResults(response.data.hits)
+    setLoading(true)
+    try {
+      const response = await axios.get(
+        `http://hn.algolia.com/api/v1/search?query=${query}`
+      );
+      setResults(response.data.hits)
+    } catch (err) {
+      setError(err)
+    }
+
+    setLoading(false)
   }
 
   const handleSearch = event => {
@@ -34,9 +40,8 @@ function App() {
     searchInputRef.current.focus();
   }
 
-  console.log(17, results)
   return (
-    <div>
+    <>
       <form onSubmit={handleSearch}>
         <input
           type="text"
@@ -45,15 +50,19 @@ function App() {
         />
         <button type="submit">Submit</button>
         <button type="button" onClick={handleClearSearch}>Clear</button>
-        <ul>
-          {results.map((result, index) => (
-            <li key={result.ObjectId}>
-              <a href={result.url}>{result.title}</a>
-            </li>
-          ))}
-        </ul>
       </form>
-    </div>
+      {loading ? (
+        <div>Loading results</div>
+      ) : (<ul>
+        {results.map((result, index) => (
+          <li key={result.ObjectId}>
+            <a href={result.url}>{result.title}</a>
+          </li>
+        ))}
+      </ul>)}
+
+      {error && <div>{error.message}</div>}
+    </>
   );
 }
 
