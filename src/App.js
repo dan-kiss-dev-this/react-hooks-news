@@ -1,24 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
+import axios from 'axios';
 import './App.css';
 
 function App() {
+  const [results, setResults] = useState([])
+  useEffect(() => {
+    axios.get('http://hn.algolia.com/api/v1/search?query=reacthooks')
+      .then(response => {
+        console.log(10, response.data)
+        setResults(response.data.hits)
+        console.log(13, results)
+      })
+  }, []);
+
+  console.log(17, results)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ul>
+        {results.map((result, index) => (
+          <li key={result.ObjectId}>
+            <a href={result.url}>{result.title}</a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
